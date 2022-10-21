@@ -1,0 +1,6 @@
+[submodule "examples/airborne_wind_energy_system/awebox"]
+	path = examples/airborne_wind_energy_system/awebox
+	url = git@github.com:jdeschut/awebox.git
+[submodule "examples/airborne_wind_energy_system/tunempc"]
+	path = examples/airborne_wind_energy_system/tunempc
+	url = https://github.com/jdeschut/tunempc
