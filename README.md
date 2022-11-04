@@ -2,10 +2,11 @@
 
 A `CasADi` Python wrapper for the `acados` integrators.
 
-All examples have been tested with Python 3.8.
+## Publication
+Fast integrators with sensitivity propagation for use in CasADi - Jonathan Frey, Jochem De Schutter, Moritz Diehl
+https://arxiv.org/abs/2211.01982
 
 ## Installation
-
 1. Install `acados` and its Python interface following https://docs.acados.org/
 
 2. Clone this repository
@@ -14,3 +15,6 @@ All examples have been tested with Python 3.8.
 ```
 pip install -e .
 ```
+
+## Examples
+All examples have been tested with Python 3.8.
