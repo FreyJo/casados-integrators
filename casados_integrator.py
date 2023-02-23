@@ -132,7 +132,7 @@ class CasadosIntegrator(Callback):
         # set
         self.acados_integrator.set("x", x0)
         self.acados_integrator.set("u", u0)
-        if self.z0:
+        if self.z0 is not None:
             self.acados_integrator.set("z", self.z0)
     
         # solve
