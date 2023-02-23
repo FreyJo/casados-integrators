@@ -24,7 +24,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from casadi import Callback, Sparsity, Function
+from casadi import Callback, Sparsity, Function, DM
 import casadi
 from acados_template import AcadosSimSolver, AcadosSim, casadi_length
 import numpy as np
@@ -61,6 +61,7 @@ class CasadosIntegrator(Callback):
 
         self.x0 = None
         self.u0 = None
+        self._z0 = None
 
         # needed to keep the callback alive
         self.jac_callback = None
@@ -71,6 +72,25 @@ class CasadosIntegrator(Callback):
 
         Callback.__init__(self)
         self.construct("CasadosIntegrator")
+
+    @property
+    def z0(self):
+        '''
+        Get initial guess of the algebraic variables
+        '''
+        return self._z0
+
+    @z0.setter
+    def z0(self, value):
+        '''
+        Set initial guess of the algebraic variables
+
+        Parameters
+        ----------
+        value : np.ndarray
+            value of the algebraic variables guess
+        '''
+        self._z0 = value
 
     def get_sparsity_in(self, i):
         if i == 0:
@@ -112,6 +132,8 @@ class CasadosIntegrator(Callback):
         # set
         self.acados_integrator.set("x", x0)
         self.acados_integrator.set("u", u0)
+        self.acados_integrator.set("z", self.z0)
+    
         # solve
         status = self.acados_integrator.solve()
 
@@ -119,7 +141,6 @@ class CasadosIntegrator(Callback):
         x_next = self.acados_integrator.get("x")
 
         self.time_sim += self.acados_integrator.get("time_tot")
-
         return [x_next]
 
     def has_jacobian(self, *args) -> bool:
