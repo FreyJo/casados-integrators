@@ -61,6 +61,7 @@ class CasadosIntegrator(Callback):
 
         self.x0 = None
         self.u0 = None
+        # variable to keep track of the initial guess of the algebraic variables
         self._z0 = None
 
         # needed to keep the callback alive
@@ -91,6 +92,8 @@ class CasadosIntegrator(Callback):
             value of the algebraic variables guess
         '''
         self._z0 = value
+        # set the value in the integrator to be used in the first call
+        self.acados_integrator.set("z", value)
 
     def get_sparsity_in(self, i):
         if i == 0:
@@ -132,8 +135,6 @@ class CasadosIntegrator(Callback):
         # set
         self.acados_integrator.set("x", x0)
         self.acados_integrator.set("u", u0)
-        if self.z0 is not None:
-            self.acados_integrator.set("z", self.z0)
     
         # solve
         status = self.acados_integrator.solve()
