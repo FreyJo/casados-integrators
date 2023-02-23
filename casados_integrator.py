@@ -24,7 +24,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from casadi import Callback, Sparsity, Function, DM
+from casadi import Callback, Sparsity, Function
 import casadi
 from acados_template import AcadosSimSolver, AcadosSim, casadi_length
 import numpy as np
