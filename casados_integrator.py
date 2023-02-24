@@ -72,6 +72,31 @@ class CasadosIntegrator(Callback):
         Callback.__init__(self)
         self.construct("CasadosIntegrator")
 
+
+    def set_z_guess(self, z0):
+        '''
+        Set initial guess of the algebraic variables
+
+        Parameters
+        ----------
+        z0 : np.ndarray
+            value of the algebraic variables guess
+        '''
+        # set the value in the integrator to be used in the first call
+        self.acados_integrator.set("z", z0)
+
+    def set_xdot_guess(self, xdot0):
+        '''
+        Set initial guess of xdot
+
+        Parameters
+        ----------
+        xdot0 : np.ndarray
+            value of xdot guess
+        '''
+        # set the value in the integrator to be used in the first call
+        self.acados_integrator.set("xdot", xdot0)
+
     def get_sparsity_in(self, i):
         if i == 0:
             out = Sparsity.dense(self.nx)
@@ -112,6 +137,7 @@ class CasadosIntegrator(Callback):
         # set
         self.acados_integrator.set("x", x0)
         self.acados_integrator.set("u", u0)
+    
         # solve
         status = self.acados_integrator.solve()
 
@@ -119,7 +145,6 @@ class CasadosIntegrator(Callback):
         x_next = self.acados_integrator.get("x")
 
         self.time_sim += self.acados_integrator.get("time_tot")
-
         return [x_next]
 
     def has_jacobian(self, *args) -> bool:
