@@ -61,8 +61,6 @@ class CasadosIntegrator(Callback):
 
         self.x0 = None
         self.u0 = None
-        # variable to keep track of the initial guess of the algebraic variables
-        self._z0 = None
 
         # needed to keep the callback alive
         self.jac_callback = None
@@ -74,26 +72,30 @@ class CasadosIntegrator(Callback):
         Callback.__init__(self)
         self.construct("CasadosIntegrator")
 
-    @property
-    def z0(self):
-        '''
-        Get initial guess of the algebraic variables
-        '''
-        return self._z0
 
-    @z0.setter
-    def z0(self, value):
+    def set_z_guess(self, z0):
         '''
         Set initial guess of the algebraic variables
 
         Parameters
         ----------
-        value : np.ndarray
+        z0 : np.ndarray
             value of the algebraic variables guess
         '''
-        self._z0 = value
         # set the value in the integrator to be used in the first call
-        self.acados_integrator.set("z", value)
+        self.acados_integrator.set("z", z0)
+
+    def set_xdot_guess(self, xdot0):
+        '''
+        Set initial guess of xdot
+
+        Parameters
+        ----------
+        xdot0 : np.ndarray
+            value of xdot guess
+        '''
+        # set the value in the integrator to be used in the first call
+        self.acados_integrator.set("xdot", xdot0)
 
     def get_sparsity_in(self, i):
         if i == 0:
