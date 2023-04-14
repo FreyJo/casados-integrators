@@ -219,7 +219,11 @@ class CasadosIntegratorSensForw(Callback):
         return out
 
     def get_sparsity_out(self, i):
-        out = Sparsity.dense(self.nx, self.nx + self.nu)
+        if i == 0:
+            out = Sparsity.dense(self.nx, self.nx)
+        elif i == 1:
+            out = Sparsity.dense(self.nx, self.nu)
+
         return out
 
     def get_name_in(self, i):
@@ -232,8 +236,14 @@ class CasadosIntegratorSensForw(Callback):
     def get_n_in(self):
         return 2
 
+    def get_n_out(self):
+        return 2
+
     def get_name_out(self, i):
-        return "S_forw"
+        if i == 0:
+            return "jac_xf_x0"
+        elif i == 1:
+            return "jac_xf_p"
 
     def eval(self, arg):
         # extract inputs
@@ -252,11 +262,12 @@ class CasadosIntegratorSensForw(Callback):
         status = self.acados_integrator.solve()
 
         # output
-        S_forw = self.acados_integrator.get("S_forw")
+        Sx = self.acados_integrator.get("Sx")
+        Su = self.acados_integrator.get("Su")
         # S_forw = np.ascontiguousarray(S_forw.reshape(S_forw.shape, order="F"))
         self.casados_integrator.time_forw += self.acados_integrator.get("time_tot")
 
-        return [S_forw]
+        return [Sx, Su]
 
     def has_jacobian(self, *args) -> bool:
         return False
