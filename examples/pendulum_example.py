@@ -196,11 +196,7 @@ def test_hessian(integrator_opts):
     seed_sym = MX.sym("seed_sym", 4, 1)
     # adj_expr = jtimes(casados_integrator(xsym, usym), xsym, seed_sym)
     # adj_fun = Function('casados_adj', [xsym, usym, seed_sym], [adj_expr])
-    # adj_result = adj_fun(x0, u0, adj_seed)
-    # print(f"adj_result {adj_result}")
-    # print(f"test_adjoint: SUCCESS!\n")
 
-    # # import pdb; pdb.set_trace()
     # hess_expr = jacobian(adj_expr, xsym)
     # hess_x = jacobian(adj_expr[0], xsym)
     # print(f"\nhess_x {hess_x}\n")
