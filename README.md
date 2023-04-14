@@ -17,4 +17,4 @@ pip install -e .
 ```
 
 ## Examples
-All examples have been tested with Python 3.8.
+All examples have been tested with Python 3.8 and `CasADi` 3.5.5.
