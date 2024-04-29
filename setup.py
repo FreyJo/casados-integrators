@@ -18,5 +18,6 @@ setup(name='casados_integrators',
       'scipy',
       'casadi',
       'matplotlib',
-   ]
+   ],
+   py_modules=["casados_integrator"]
 )
