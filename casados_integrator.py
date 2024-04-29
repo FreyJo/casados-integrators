@@ -173,19 +173,10 @@ class CasadosIntegrator(Callback):
 
     def get_jacobian(self, *args):
 
-        sens_callback = CasadosIntegratorSensForw(self)
+        if self.jac_callback is None:
+            self.jac_callback = CasadosIntegratorSensForw(self)
 
-        nominal_in = self.mx_in()
-        nominal_out = self.mx_out()
-
-        jac_fun = Function(
-            f"CasadosIntegratorSensForw_{self.model_name}",
-            nominal_in + nominal_out,
-            sens_callback.call(nominal_in)
-        )
-        # jac_fun = Function(name, nominal_in+nominal_out+adj_seed, callback.call(nominal_in+adj_seed), inames, onames)
-
-        return jac_fun
+        return self.jac_callback
 
     def has_reverse(self, nadj) -> bool:
         if nadj == 1:
@@ -194,7 +185,6 @@ class CasadosIntegrator(Callback):
             return False
 
     def get_reverse(self, *args) -> "casadi::Function":
-        # def get_reverse(self, nadj, name, inames, onames, opts) -> "casadi::Function":
 
         if self.adj_callback is None:
             self.adj_callback = CasadosIntegratorSensAdj(self)
@@ -230,13 +220,15 @@ class CasadosIntegratorSensForw(Callback):
 
         Callback.__init__(self)
         self.construct("CasadosIntegratorSensForw")
-        casados_integrator.jac_callback = self
+        # casados_integrator.jac_callback = self
 
     def get_sparsity_in(self, i):
         if i == 0:
             out = Sparsity.dense(self.nx)
         elif i == 1:
             out = Sparsity.dense(self.nu)
+        elif i == 2:
+            out = Sparsity.dense(self.nx)
         return out
 
     def get_sparsity_out(self, i):
@@ -251,10 +243,12 @@ class CasadosIntegratorSensForw(Callback):
             out = "x0"
         elif i == 1:
             out = "u0"
+        elif i == 2:
+            out = "xf"
         return out
 
     def get_n_in(self):
-        return 2
+        return 3
     
     def get_n_out(self):
         return 2
