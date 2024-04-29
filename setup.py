@@ -16,7 +16,7 @@ setup(name='casados_integrators',
    install_requires=[
       'numpy',
       'scipy',
-      'casadi<3.6',
+      'casadi',
       'matplotlib',
    ]
 )

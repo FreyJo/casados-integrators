@@ -181,7 +181,7 @@ class CasadosIntegrator(Callback):
         jac_fun = Function(
             f"CasadosIntegratorSensForw_{self.model_name}",
             nominal_in + nominal_out,
-            sens_callback.call(nominal_in),
+            sens_callback.call(nominal_in)
         )
         # jac_fun = Function(name, nominal_in+nominal_out+adj_seed, callback.call(nominal_in+adj_seed), inames, onames)
 
@@ -240,7 +240,10 @@ class CasadosIntegratorSensForw(Callback):
         return out
 
     def get_sparsity_out(self, i):
-        out = Sparsity.dense(self.nx, self.nx + self.nu)
+        if i == 0:
+            out = Sparsity.dense(self.nx, self.nx)
+        if i == 1:
+            out = Sparsity.dense(self.nx, self.nu)
         return out
 
     def get_name_in(self, i):
@@ -252,9 +255,16 @@ class CasadosIntegratorSensForw(Callback):
 
     def get_n_in(self):
         return 2
+    
+    def get_n_out(self):
+        return 2
 
     def get_name_out(self, i):
-        return "S_forw"
+        if i == 0:
+            out = "jac_xf_x0"
+        if i == 1:
+            out = "jac_xf_p"
+        return out
 
     def eval(self, arg):
         # extract inputs
@@ -277,7 +287,7 @@ class CasadosIntegratorSensForw(Callback):
         # S_forw = np.ascontiguousarray(S_forw.reshape(S_forw.shape, order="F"))
         self.casados_integrator.time_forw += self.acados_integrator.get("time_tot")
 
-        return [S_forw]
+        return [ S_forw[:, :self.nx], S_forw[:, self.nx:] ]
 
     def has_jacobian(self, *args) -> bool:
         return False
