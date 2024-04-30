@@ -45,7 +45,7 @@ def check_casadi_version():
             )
         if int(minor) > 5:
             raise Exception(
-                f"CasadosIntegrator does not support CasADi version >= 3.6.0. CasADi version {casadi_version} was found."
+                f"CasadosIntegrator does not support CasADi version >= 3.6.0. CasADi version {casadi_version} was found. Please downgrade CasADi to 3.5.5 or look for a newer version of CasadosIntegrator at https://github.com/FreyJo/casados-integrators."
             )
 
 
