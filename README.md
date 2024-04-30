@@ -27,4 +27,5 @@ pip install -e .
 ```
 
 ## Examples
-All examples have been tested with Python 3.8 and `CasADi` 3.5.5.
+The Pendulum Example has been tested with Python 3.11 and `CasADi` 3.6.5.
+Other examples are not tested with `CasADi` 3.6.x.
