@@ -38,15 +38,13 @@ def check_casadi_version():
         raise Exception(
             f"casadi version {casadi_version} is too old. Need at least 3.0.0"
         )
-    if int(major) == 3:
-        if int(minor) < 5:
-            print(
-                f"Warning: CasadosIntegrator not tested with CasADi version {casadi_version}."
-            )
-        elif int(minor) < 6:
+    elif int(major) == 3:
+        if int(minor) < 6:
             raise Exception(
                 f"This version of CasadosIntegrator supports CasADi version >= 3.6.0. CasADi version {casadi_version} was found. Please look for an older version of CasadosIntegrator at https://github.com/FreyJo/casados-integrators or upgrade your CasADi version."
             )
+    else:
+        print(f"Warning: This version of CasadosIntegrator supports CasADi version >= 3.6.0. CasADi version {casadi_version} was found and is not tested.")
 
 
 class CasadosIntegrator(Callback):
