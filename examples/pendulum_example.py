@@ -357,7 +357,7 @@ def solve_ocp_nlp(
         plot_pendulum(np.linspace(0, Tf, N + 1), umax, U_sol.T, X_sol.T, latexify=False)
 
     print(
-        f"\ntest_ocp_nlp: SUCESSS, with use_acados_integrator = {use_acados_integrator}!\n"
+        f"\nsolve_ocp_nlp: SUCESSS, with use_acados_integrator = {use_acados_integrator}!\n"
     )
 
     stats = sol.stats()
@@ -392,6 +392,10 @@ def main():
 
     test_adjoint(integrator_opts)
     test_hessian(integrator_opts)
+
+    # NOTE: either run ocp_nlp test or the ones above!
+    # Some library is not unloaded properly.
+
     # results_casadi = solve_ocp_nlp(integrator_opts, use_acados_integrator=False)
     # results_acados = solve_ocp_nlp(integrator_opts, use_acados_integrator=True)
 
