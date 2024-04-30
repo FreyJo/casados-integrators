@@ -392,6 +392,10 @@ def main():
 
     test_adjoint(integrator_opts)
     test_hessian(integrator_opts)
+
+    # NOTE: either run ocp_nlp test or the ones above!
+    # Some library is not unloaded properly.
+
     # results_casadi = solve_ocp_nlp(integrator_opts, use_acados_integrator=False)
     # results_acados = solve_ocp_nlp(integrator_opts, use_acados_integrator=True)
 
