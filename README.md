@@ -26,6 +26,9 @@ Please cite as
 pip install -e .
 ```
 
-## Examples
-The Pendulum Example has been tested with Python 3.11 and `CasADi` 3.6.5.
+## Examples and Supported versions
+The pendulum example has been tested with Python 3.11 and `CasADi` 3.6.5.
 Other examples are not tested with `CasADi` 3.6.x.
+
+## CasADi 3.5.
+Please check out [`casados-integrators v1.0.0`](https://github.com/FreyJo/casados-integrators/releases/tag/v1.0.0)
