@@ -24,10 +24,29 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from casadi import Callback, Sparsity, Function
+from casadi import Callback, Sparsity, Function, CasadiMeta
 import casadi
 from acados_template import AcadosSimSolver, AcadosSim, casadi_length
 import numpy as np
+
+
+
+def check_casadi_version():
+    casadi_version = CasadiMeta.version()
+    major, minor, patch = casadi_version.split(".")
+    if int(major) < 3:
+        raise Exception(
+            f"casadi version {casadi_version} is too old. Need at least 3.0.0"
+        )
+    if int(major) == 3:
+        if int(minor) < 5:
+            print(
+                f"Warning: CasadosIntegrator not tested with CasADi version {casadi_version}. Only tested with 3.5.5."
+            )
+        if int(minor) > 5:
+            raise Exception(
+                f"CasadosIntegrator does not support CasADi version >= 3.6.0. CasADi version {casadi_version} was found."
+            )
 
 
 class CasadosIntegrator(Callback):
@@ -41,6 +60,8 @@ class CasadosIntegrator(Callback):
     """
 
     def __init__(self, acados_sim: AcadosSim, use_cython=True, code_reuse=False):
+
+        check_casadi_version()
 
         if use_cython:
             json_file = f"acados_sim_{acados_sim.model.name}.json"
