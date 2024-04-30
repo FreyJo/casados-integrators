@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(name='casados_integrators',
    version='0.1',
-   python_requires='>=3.7',
+   python_requires='>=3.8',
    description='A CasADi Python wrapper for the acados integrators',
    author='Jonathan Frey',
    use_scm_version={
@@ -16,7 +16,8 @@ setup(name='casados_integrators',
    install_requires=[
       'numpy',
       'scipy',
-      'casadi<3.6',
+      'casadi>=3.6.0',
       'matplotlib',
-   ]
+   ],
+   py_modules=["casados_integrator"]
 )

@@ -126,7 +126,7 @@ def evaluate_adjoint(integrator_opts, use_acados=True, use_cython=False):
         integrator_out = test_integrator(xsym, usym)
     else:
         test_integrator = create_casadi_integrator(model, integrator_opts, dt=dt)
-        integrator_out = test_integrator(xsym, usym, [], [], [], [])[0]
+        integrator_out = test_integrator(x0=xsym, p=usym)["xf"]
 
 
     adj_expr_xu = jtimes(
