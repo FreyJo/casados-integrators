@@ -279,7 +279,7 @@ class CasadosIntegratorSensForw(Callback):
         # S_forw = np.ascontiguousarray(S_forw.reshape(S_forw.shape, order="F"))
         self.casados_integrator.time_forw += self.acados_integrator.get("time_tot")
 
-        return [ S_forw[:, :self.nx], S_forw[:, self.nx:] ]
+        return [S_forw[:, :self.nx], S_forw[:, self.nx:]]
 
     def has_jacobian(self, *args) -> bool:
         return False
@@ -449,7 +449,7 @@ class CasadosIntegratorSensHess(Callback):
         elif i == 6:
             out = Sparsity.dense(self.nu, self.nx)
         elif i == 7:
-            out = Sparsity.dense(self.nu, self.nx)        
+            out = Sparsity.dense(self.nu, self.nx)
         return out
 
     def get_name_in(self, i):
@@ -498,7 +498,7 @@ class CasadosIntegratorSensHess(Callback):
         S_hess = self.acados_integrator.get("S_hess")
         S_forw = self.acados_integrator.get("S_forw")
 
-        # NOTE: old casadi expects jacobian(S_adj, [x, u, nominal_out, seed_adj])
+        # NOTE: old casadi (<3.6) expects jacobian(S_adj, [x, u, nominal_out, seed_adj])
         #                            = [S_hess(for x,u), zeros(nx+nu, nx), S_forw ]
         # out = np.concatenate(
         #     [S_hess, np.zeros((self.nx + self.nu, self.nx)), S_forw.T], axis=1
@@ -506,7 +506,7 @@ class CasadosIntegratorSensHess(Callback):
 
         self.casados_integrator.time_hess += self.acados_integrator.get("time_tot")
 
-        # new casadi jacobian api wants:
+        # new casadi (>=3.6) jacobian api wants:
         # in: ['x0', 'u0', 'nominal_out', 'adj_seed', 'out_S_adj_x0', 'out_S_adj_p']
         # out: ['jac_S_adj_x0_x0', 'jac_S_adj_x0_u0', 'jac_S_adj_x0_nominal_out', 'jac_S_adj_x0_adj_seed',
         # 'jac_S_adj_p_x0', 'jac_S_adj_p_u0', 'jac_S_adj_p_nominal_out', 'jac_S_adj_p_adj_seed']
