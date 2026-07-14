@@ -59,7 +59,7 @@ def export_chain_mass_ocp_solver(chain_params, integrator_opts):
     x0 = xrest
 
     # set dimensions
-    ocp.dims.N = N
+    ocp.solver_options.N_horizon = N
 
     # set cost module
     ocp.cost.cost_type = "LINEAR_LS"
@@ -446,7 +446,7 @@ def run_nominal_control_open_loop(chain_params, integrator_opts=None):
 
             # solve ocp
             status = acados_ocp_solver.solve()
-            timings[i] = acados_ocp_solver.get_stats("time_tot")[0]
+            timings[i] = acados_ocp_solver.get_stats("time_tot")
 
             # if i == 0:
             acados_ocp_solver.print_statistics()
