@@ -180,9 +180,9 @@ def run_nominal_control_open_loop(chain_params, integrator_opts=None):
 
     if chain_params["nlp_solver"] == "acados":
         acados_ocp_solver = export_chain_mass_ocp_solver(chain_params, integrator_opts)
-        nx = acados_ocp_solver.acados_ocp.dims.nx
-        nu = acados_ocp_solver.acados_ocp.dims.nu
-        xrest = acados_ocp_solver.acados_ocp.constraints.lbx_0
+        nx = acados_ocp_solver.ocp.dims.nx
+        nu = acados_ocp_solver.ocp.dims.nu
+        xrest = acados_ocp_solver.ocp.constraints.lbx_0
     elif chain_params["nlp_solver"] in ["IPOPT", "IPOPT_nohess"]:
         # chain parameters
         M = chain_params["n_mass"] - 2  # number of intermediate masses
