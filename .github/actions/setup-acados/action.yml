@@ -1,0 +1,78 @@
+name: 'Setup acados environment'
+description: 'Sets up python and acados dependencies'
+inputs:
+  python-version:
+    description: 'Python version to use'
+    required: true
+    default: '3.11'
+
+runs:
+  using: 'composite'
+  steps:
+
+    - name: Checkout acados repository
+      uses: actions/checkout@v4
+      with:
+        repository: acados/acados
+        path: acados
+
+    - name: Get latest acados run-id
+      id: get-run-id
+      env:
+        GH_TOKEN: ${{ github.token }}
+      shell: bash
+      run: |
+        RUN_ID=$(gh run list --repo acados/acados \
+                             --workflow full_build.yml \
+                             --branch main \
+                             --status success \
+                             --limit 1 \
+                             --json databaseId \
+                             --jq '.[0].databaseId')
+        echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+
+    - name: Download latest acados artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: acados
+        repository: acados/acados
+        github-token: ${{ github.token }}
+        run-id: ${{ steps.get-run-id.outputs.run_id }}
+
+    - name: Rename artifact directories
+      working-directory: acados
+      shell: bash
+      run: for dir in *-build-*; do mv "$dir" "${dir%%-build-*}"; done
+
+    - name: Install Tera
+      working-directory: acados
+      shell: bash
+      run: |
+        .github/linux/install_tera.sh
+
+    - name: Export Paths
+      shell: bash
+      run: |
+        echo "ACADOS_SOURCE_DIR=${{github.workspace}}/acados" >> $GITHUB_ENV
+        echo "ACADOS_INSTALL_DIR=${{github.workspace}}/acados" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=${{github.workspace}}/acados/lib" >> $GITHUB_ENV
+
+    - name: Set up Python ${{ inputs.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-py${{ inputs.python-version }}-pip-acados
+        restore-keys: |
+          ${{ runner.os }}-py${{ inputs.python-version }}-pip-
+
+    - name: Install acados Python interface
+      working-directory: acados
+      shell: bash
+      run: |
+        pip install --upgrade pip
+        pip install interfaces/acados_template

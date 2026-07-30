@@ -76,7 +76,7 @@ def create_casadi_integrator(model, integrator_opts, dt=0.1):
     casadi_integrator = integrator(
         "casadi_integrator",
         "collocation",
-        {"x": x, "p": u, "ode": model.f_expl_expr},
+        {"x": x, "u": u, "ode": model.f_expl_expr},
         {
             "tf": dt,
             "collocation_scheme": integrator_opts["collocation_scheme"],

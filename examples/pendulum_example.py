@@ -28,7 +28,7 @@ def run_forward_sim(integrator_opts, plot_traj=False, use_acados=True, use_cytho
     print(f"\n created test_integrator:\n{test_integrator}\n")
 
     # test call
-    result = test_integrator(x0=x0, p=u0)["xf"]
+    result = test_integrator(x0=x0, u=u0, p=dt)["xf"]
     print(f"test_integrator test eval, result: {result}")
 
     # print(f"test_integrator.has_jacobian(): {test_integrator.has_jacobian()}")
@@ -45,7 +45,7 @@ def run_forward_sim(integrator_opts, plot_traj=False, use_acados=True, use_cytho
 
     for i in range(Nsim):
         simX[i + 1, :] = (
-            test_integrator(x0=simX[i, :], p=u0)["xf"].full().reshape((nx,))
+            test_integrator(x0=simX[i, :], u=u0, p=dt)["xf"].full().reshape((nx,))
         )
         simU[i, :] = u0
 
@@ -81,12 +81,12 @@ def evaluate_jacobian(integrator_opts, use_acados=True, use_cython=False):
         test_integrator = create_casadi_integrator(model, integrator_opts, dt=dt)
     print(f"\n created test_integrator:\n{test_integrator}\n")
 
-    jac_x_expr = jacobian(test_integrator(x0=xsym, p=usym)["xf"], xsym)
+    jac_x_expr = jacobian(test_integrator(x0=xsym, u=usym, p=dt)["xf"], xsym)
     jac_x_fun = Function("casados_jacobian_x", [xsym, usym], [jac_x_expr])
     jac_x_result = jac_x_fun(x0, u0).full()
     # print(f'jac_x_result \n{np.array(jac_x_result)}')
 
-    jac_u_expr = jacobian(test_integrator(x0=xsym, p=usym)["xf"], usym)
+    jac_u_expr = jacobian(test_integrator(x0=xsym, u=usym, p=dt)["xf"], usym)
     jac_u_fun = Function("casados_jacobian_x", [xsym, usym], [jac_u_expr])
     jac_u_result = jac_u_fun(x0, u0).full()
     # print(f'jac_u_result \n{np.array(jac_u_result)}')
@@ -123,10 +123,10 @@ def evaluate_adjoint(integrator_opts, use_acados=True, use_cython=False):
         test_integrator = create_casados_integrator(
             model, integrator_opts, dt=dt, use_cython=use_cython
         )
-        integrator_out = test_integrator(xsym, usym)
+        integrator_out = test_integrator(xsym, usym, dt)
     else:
         test_integrator = create_casadi_integrator(model, integrator_opts, dt=dt)
-        integrator_out = test_integrator(x0=xsym, p=usym)["xf"]
+        integrator_out = test_integrator(x0=xsym, u=usym)["xf"]
 
 
     adj_expr_xu = jtimes(
@@ -165,13 +165,13 @@ def test_adjoint(integrator_opts):
 
     seed_sym = MX.sym("seed_sym", 4, 1)
     # NOTE: True forces reverse AD
-    adj_expr_x = jtimes(casados_integrator(xsym, usym), xsym, seed_sym, True)
+    adj_expr_x = jtimes(casados_integrator(xsym, usym, dt), xsym, seed_sym, True)
     adj_fun_x = Function("casados_adj", [xsym, usym, seed_sym], [adj_expr_x])
     adj_result_x = adj_fun_x(x0, u0, adj_seed)
     print(f"adj_result_x {adj_result_x}")
 
     adj_expr_xu = jtimes(
-        casados_integrator(xsym, usym), vertcat(xsym, usym), seed_sym, True
+        casados_integrator(xsym, usym, dt), vertcat(xsym, usym), seed_sym, True
     )
     adj_fun_xu = Function("casados_adj", [xsym, usym, seed_sym], [adj_expr_xu])
     adj_result_xu = adj_fun_xu(x0, u0, adj_seed)
@@ -203,7 +203,7 @@ def test_hessian(integrator_opts):
 
     # xu version
     adj_expr_xu = jtimes(
-        casados_integrator(xsym, usym), vertcat(xsym, usym), seed_sym, True
+        casados_integrator(xsym, usym, dt), vertcat(xsym, usym), seed_sym, True
     )
     adj_fun_xu = Function("casados_adj", [xsym, usym, seed_sym], [adj_expr_xu])
     hess_expr = jacobian(adj_expr_xu, vertcat(xsym, usym))
@@ -263,7 +263,7 @@ def solve_ocp_nlp(
             x = X_sym[:, k]
             u = U_sym[:, k]
             if SINGLE_INTEGRATOR:
-                x_next = casados_integrator(x, u)
+                x_next = casados_integrator(x, u, dT)
             else:
                 integrator_list.append(
                     create_casados_integrator(
@@ -271,7 +271,7 @@ def solve_ocp_nlp(
                     )
                 )
                 casados_integrator = integrator_list[-1]
-                x_next = casados_integrator(x, u)
+                x_next = casados_integrator(x, u, dT)
 
             opti.subject_to(X_sym[:, k + 1] == x_next)
     else:
@@ -293,7 +293,7 @@ def solve_ocp_nlp(
         casadi_integrator = integrator(
             "casadi_integrator",
             "collocation",
-            {"x": x, "p": u, "ode": model.f_expl_expr},
+            {"x": x, "u": u, "ode": model.f_expl_expr},
             {
                 "tf": dT,
                 "collocation_scheme": integrator_opts["collocation_scheme"],
@@ -306,7 +306,7 @@ def solve_ocp_nlp(
         for k in range(N):
             x = X_sym[:, k]
             u = U_sym[:, k]
-            x_next = casadi_integrator(x0=x, p=u)["xf"]
+            x_next = casadi_integrator(x0=x, u=u)["xf"]
             opti.subject_to(X_sym[:, k + 1] == x_next)
 
     # Path constraints

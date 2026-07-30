@@ -34,6 +34,7 @@ import json, os
 import numpy as np
 import casadi as ca
 from chain_mass_model import export_chain_mass_model, export_disturbed_chain_mass_model
+
 from acados_template import AcadosSim, AcadosSimSolver, make_object_json_dumpable
 
 
@@ -170,6 +171,7 @@ def export_chain_mass_integrator(chain_params):
     model = export_disturbed_chain_mass_model(chain_params)
     sim.model = model
 
+    sim.solver_options.T = chain_params["Ts"]
     # disturbances
     nparam = 3 * M
     sim.parameter_values = np.zeros((nparam,))
@@ -184,7 +186,7 @@ def export_chain_mass_integrator(chain_params):
 
     # acados_ocp_solver = AcadosOcpSolver(ocp, json_file = 'acados_ocp_' + model.name + '.json')
     acados_integrator = AcadosSimSolver(
-        sim, json_file="acados_sim_" + model.name + ".json"
+        sim, json_file="acados_sim_" + model.name + ".json",
     )
 
     return acados_integrator
