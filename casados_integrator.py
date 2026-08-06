@@ -24,9 +24,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from casadi import Callback, Sparsity, Function, CasadiMeta, DM
+from casadi import Callback, Sparsity, CasadiMeta, DM
 import casadi
-from acados_template import AcadosSimSolver, AcadosSim, casadi_length, is_empty
+from acados_template import AcadosSimSolver, AcadosSim, casadi_length
 import numpy as np
 
 
@@ -60,20 +60,14 @@ class CasadosIntegrator(Callback):
     but the sensitivities w.r.t p and dt are not computed.
     """
 
-    def __init__(self, acados_sim: AcadosSim, use_cython=True, code_reuse=False):
+    def __init__(self, acados_sim: AcadosSim, use_cython: bool = True, code_reuse: bool = False):
 
         check_casadi_version()
 
         if use_cython:
-            json_file = f"acados_sim_{acados_sim.model.name}.json"
-            if not code_reuse:
-                AcadosSimSolver.generate(acados_sim, json_file=json_file)
-                AcadosSimSolver.build(
-                    acados_sim.code_export_directory, with_cython=True
-                )
-            self.acados_integrator = AcadosSimSolver.create_cython_solver(json_file)
+            self.acados_integrator = AcadosSimSolver.create_cython_solver(acados_sim, generate = not code_reuse, build = not code_reuse)
         else:
-            self.acados_integrator = AcadosSimSolver(acados_sim)
+            self.acados_integrator = AcadosSimSolver(acados_sim, generate = not code_reuse, build = not code_reuse)
 
         self.nx = casadi_length(acados_sim.model.x)
         self.nu = casadi_length(acados_sim.model.u)
