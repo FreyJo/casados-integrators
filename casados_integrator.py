@@ -205,7 +205,9 @@ class CasadosIntegrator(Callback):
         self.acados_integrator.set("u", np.asarray(u0).flatten())
         if self.np_ > 0:
             self.acados_integrator.set("p", p[: self.np_])
-        self.acados_integrator.set("T", float(p[-1]))
+        T = float(p[-1])
+        if not np.isclose(self.acados_integrator.get("T"), T, rtol=1e-6, atol=0.0):
+            self.acados_integrator.set("T", T)
 
 # NOTE: doesnt even get called -> dead end -> see https://github.com/casadi/casadi/issues/2019
 # def uses_output(self, *args) -> bool:
